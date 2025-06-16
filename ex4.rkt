@@ -59,7 +59,7 @@
 
 ;;; Q3.2
 ; Signature: equal-trees$(tree1, tree2, succ, fail) 
-; Type: [Tree * Tree * [Tree ->T1] * [Pair->T2] -> T1 U T2
+; Type: [Tree * Tree * [Tree ->T1] * [Pair->T2] -> T1 U T2]
 ; Purpose: Determines the structure identity of a given two lists, with post-processing succ/fail
 (define equal-trees$ 
   (lambda (tree1 tree2 succ fail)
@@ -110,6 +110,7 @@
       (lambda () (** (tail x) (tail y))))
   )
 )
+
 ;; Signature: //(x, y)
 ;; Type: [ Lzl(Number) * Lzl(Number) -> Lzl(Number) ]
 ;; Purpose: Division of real numbers
