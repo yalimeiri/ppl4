@@ -77,17 +77,17 @@
 ;; constant real number
 (define as-real
   (lambda (x)
-    #f ;@TODO
+    (cons-lzl x (lambda () (as-real x)))
   )
 )
-
 
 ;; Signature: ++(x, y)
 ;; Type: [ Lzl(Number) * Lzl(Number) -> Lzl(Number) ]
 ;; Purpose: Addition of real numbers
 (define ++
   (lambda (x y)
-    #f ;@TODO
+    (cons-lzl (+ (head x) (head y))
+      (lambda () (++ (tail x) (tail y))))
   )
 )
 
@@ -96,7 +96,8 @@
 ;; Purpose: Subtraction of real numbers
 (define --
   (lambda (x y)
-    #f ;@TODO
+    (cons-lzl (- (head x) (head y))
+      (lambda () (-- (tail x) (tail y))))
   )
 )
 
@@ -105,7 +106,8 @@
 ;; Purpose: Multiplication of real numbers
 (define **
   (lambda (x y)
-    #f ;@TODO
+    (cons-lzl (* (head x) (head y))
+      (lambda () (** (tail x) (tail y))))
   )
 )
 ;; Signature: //(x, y)
@@ -113,7 +115,8 @@
 ;; Purpose: Division of real numbers
 (define //
   (lambda (x y)
-    #f ;@TODO
+    (cons-lzl (/ (head x) (head y))
+      (lambda () (// (tail x) (tail y))))
   )
 )
 
@@ -125,7 +128,10 @@
 ;; square root of `x`
 (define sqrt-with
   (lambda (x y)
-    #f ;@TODO
+    (cons-lzl y 
+      (lambda () 
+        (sqrt-with x 
+          (// (++ (** y y) x) (** (as-real 2) y)))))
   )
 )
 
@@ -135,7 +141,9 @@
 ;; Purpose: Diagonalize an infinite lazy list
 (define diag
   (lambda (lzl)
-    #f ;@TODO
+    (cons-lzl (head (head lzl)) 
+      (lambda () 
+        (diag (map-lzl tail (tail lzl)))))
   )
 )
 
@@ -146,6 +154,6 @@
 ;; Example: (take (rsqrt (as-real 4.0)) 6) => '(4.0 2.5 2.05 2.0006097560975613 2.0000000929222947 2.000000000000002)
 (define rsqrt
   (lambda (x)
-    #f ;@TODO
+    (diag (sqrt-with x x))
   )
 )
