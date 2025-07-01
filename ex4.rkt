@@ -61,11 +61,30 @@
 ; Signature: equal-trees$(tree1, tree2, succ, fail) 
 ; Type: [Tree * Tree * [Tree ->T1] * [Pair->T2] -> T1 U T2
 ; Purpose: Determines the structure identity of a given two lists, with post-processing succ/fail
-(define equal-trees$ 
-  (lambda (tree1 tree2 succ fail)
-    #f ;@TODO
-  )
-)
+(define equal-trees$
+  (lambda (t1 t2 succ fail)
+    (cond
+      ;; Both trees are empty
+      [(and (null? t1) (null? t2))
+       (succ '())]
+      
+      ;; Both trees are atoms
+      [(and (not (pair? t1)) (not (pair? t2)))
+       (succ (cons t1 t2))]
+      
+      ;; Both trees are lists
+      [(and (pair? t1) (pair? t2))
+       (equal-trees$ (car t1) (car t2)
+                    (lambda (car-result)
+                      (equal-trees$ (cdr t1) (cdr t2)
+                                  (lambda (cdr-result)
+                                    (succ (cons car-result cdr-result)))
+                                  fail))
+                    fail)]
+      
+      ;; Trees have different structure
+      [else
+       (fail (cons t1 t2))])))
 
 
 
@@ -77,17 +96,17 @@
 ;; constant real number
 (define as-real
   (lambda (x)
-    #f ;@TODO
+    (cons-lzl x (lambda () (as-real x)))
   )
 )
-
 
 ;; Signature: ++(x, y)
 ;; Type: [ Lzl(Number) * Lzl(Number) -> Lzl(Number) ]
 ;; Purpose: Addition of real numbers
 (define ++
   (lambda (x y)
-    #f ;@TODO
+    (cons-lzl (+ (head x) (head y))
+      (lambda () (++ (tail x) (tail y))))
   )
 )
 
@@ -96,7 +115,8 @@
 ;; Purpose: Subtraction of real numbers
 (define --
   (lambda (x y)
-    #f ;@TODO
+    (cons-lzl (- (head x) (head y))
+      (lambda () (-- (tail x) (tail y))))
   )
 )
 
@@ -105,15 +125,18 @@
 ;; Purpose: Multiplication of real numbers
 (define **
   (lambda (x y)
-    #f ;@TODO
+    (cons-lzl (* (head x) (head y))
+      (lambda () (** (tail x) (tail y))))
   )
 )
+
 ;; Signature: //(x, y)
 ;; Type: [ Lzl(Number) * Lzl(Number) -> Lzl(Number) ]
 ;; Purpose: Division of real numbers
 (define //
   (lambda (x y)
-    #f ;@TODO
+    (cons-lzl (/ (head x) (head y))
+      (lambda () (// (tail x) (tail y))))
   )
 )
 
@@ -125,7 +148,10 @@
 ;; square root of `x`
 (define sqrt-with
   (lambda (x y)
-    #f ;@TODO
+    (cons-lzl y 
+      (lambda () 
+        (sqrt-with x 
+          (// (++ (** y y) x) (** (as-real 2) y)))))
   )
 )
 
@@ -135,7 +161,9 @@
 ;; Purpose: Diagonalize an infinite lazy list
 (define diag
   (lambda (lzl)
-    #f ;@TODO
+    (cons-lzl (head (head lzl)) 
+      (lambda () 
+        (diag (map-lzl tail (tail lzl)))))
   )
 )
 
@@ -146,6 +174,6 @@
 ;; Example: (take (rsqrt (as-real 4.0)) 6) => '(4.0 2.5 2.05 2.0006097560975613 2.0000000929222947 2.000000000000002)
 (define rsqrt
   (lambda (x)
-    #f ;@TODO
+    (diag (sqrt-with x x))
   )
 )
